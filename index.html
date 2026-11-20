@@ -3939,6 +3939,82 @@ function doPost(e) {
         .catch((err) => console.log('Pendaftaran SW gagal:', err));
     });
   }
+   // ============================================================================
+// FUNGSI PENYIMPANAN OTOMATIS (MATH KAKAK)
+// File ini berisi fungsi simpan ke memori lokal (localStorage) dan
+// pengiriman data otomatis ke Google Spreadsheet via Google Apps Script Web App.
+// ============================================================================
+
+// 1. Masukkan URL Web App Google Apps Script Anda (yang berakhiran /exec)
+var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRZ_E4NRrHDe7x4WYVvVnQu-PfkAcQiCJsxw3GipshcCrInGQAxC4-s5iACYdruDTo/exec';
+
+/**
+ * Menyimpan riwayat pengerjaan latihan siswa secara ganda:
+ * 1. Ke penyimpanan lokal browser/ponsel (localStorage) agar instan & persisten
+ * 2. Ke Google Spreadsheet (melalui fetch POST no-cors)
+ *
+ * @param {Object} record - Objek data riwayat latihan siswa
+ */
+function simpanRiwayatLatihan(record) {
+  // -------------------------------------------------------------
+  // A. SIMPAN KE MEMORI LOKAL BROWSER (localStorage)
+  // -------------------------------------------------------------
+  try {
+    var riwayatLokal = JSON.parse(localStorage.getItem('math_kakak_history') || '[]');
+    riwayatLokal.unshift(record);
+    // Batasi penyimpanan riwayat lokal hingga 100 sesi terakhir
+    localStorage.setItem('math_kakak_history', JSON.stringify(riwayatLokal.slice(0, 100)));
+    console.log('Riwayat sukses disimpan ke localStorage.');
+  } catch (e) {
+    console.warn('Peringatan: Gagal menyimpan riwayat ke localStorage:', e);
+  }
+
+  // -------------------------------------------------------------
+  // B. KIRIM OTOMATIS KE GOOGLE SPREADSHEET (APPS SCRIPT)
+  // -------------------------------------------------------------
+  if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbyRZ_E4NRrHDe7x4WYVvVnQu-PfkAcQiCJsxw3GipshcCrInGQAxC4-s5iACYdruDTo/exec') {
+    var payload = {
+      tanggalWaktu: record.dateDisplay || new Date().toLocaleString('id-ID'),
+      namaSiswa: record.studentName || 'Tanpa Nama',
+      topikMateri: record.topicTitle || '-',
+      jumlahSoal: record.questionCount || 0,
+      benar: record.correctCount || 0,
+      nilai: record.score || 0,
+      totalWaktu: record.totalTimeDisplay || '0m 0s',
+      rataRataDetik: (record.avgTimeSec || 0) + ' detik',
+      rekapJawaban: record.rekapSummary || '-'
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Menghindari pemblokiran CORS oleh peramban
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    }).then(function() {
+      console.log('Data sukses terkirim ke Google Spreadsheet!');
+    }).catch(function(err) {
+      console.error('Koneksi pengiriman ke Google Apps Script gagal:', err);
+    });
+  }
+}
+
+/**
+ * Membaca data riwayat latihan dari memori lokal (localStorage)
+ * Digunakan untuk merender tabel riwayat saat aplikasi dibuka
+ *
+ * @returns {Array} Daftar riwayat latihan siswa
+ */
+function muatRiwayatDariLokal() {
+  try {
+    return JSON.parse(localStorage.getItem('math_kakak_history') || '[]');
+  } catch (e) {
+    console.warn('Gagal membaca data dari localStorage:', e);
+    return [];
+  }
+}
+ 
   </script>  
 </body>
 </html>
