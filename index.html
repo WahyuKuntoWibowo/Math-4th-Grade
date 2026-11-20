@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <meta name="theme-color" content="#c2207f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="artifact-type" content="tool">
@@ -8,10 +12,6 @@
   <title>Latihan Matematika Kelas 4 SD — Kurikulum Merdeka</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css">
-  <link rel="manifest" href="./manifest.json">
-  <link rel="apple-touch-icon" href="./icon-192.png">
-  <meta name="theme-color" content="#c2207f">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <style>
     :root {
       color-scheme: light;
@@ -3932,15 +3932,13 @@ function doPost(e) {
     }
 
     initApp();
-  </script>
-  <script>
-  if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
         .then(() => console.log('Service Worker PWA aktif!'))
         .catch((err) => console.log('Pendaftaran SW gagal:', err));
     });
   }
-</script>
+  </script>  
 </body>
 </html>
